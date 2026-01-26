@@ -7,6 +7,8 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/pin_providers.dart';
 import '../widgets/pin_card.dart';
+import '../../../messages/presentation/screens/messages_screen.dart';
+import '../../../notifications/presentation/screens/notifications_full_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -85,11 +87,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsFullScreen(),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.chat_bubble_outline, color: AppTheme.textPrimary),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MessagesScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),

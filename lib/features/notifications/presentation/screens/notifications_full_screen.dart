@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+class NotificationsFullScreen extends StatelessWidget {
+  const NotificationsFullScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +13,10 @@ class NotificationsScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: AppTheme.backgroundColor,
           elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: const Text(
             'Updates',
             style: TextStyle(

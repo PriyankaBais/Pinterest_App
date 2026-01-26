@@ -90,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   // Username
                   const Text(
-                    'John Doe',
+                    'Priyanka Bais',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   // Email
                   Text(
-                    'john.doe@example.com',
+                    'priyanka.bais@example.com',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
