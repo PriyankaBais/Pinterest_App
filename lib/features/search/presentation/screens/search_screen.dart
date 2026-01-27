@@ -68,7 +68,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            // SearchScreen is used both as a tab (IndexedStack) and as a pushed route.
+            // If it was pushed, pop. If it's the tab, force-navigate to Home route.
+            if (Navigator.of(context).canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
         ),
         title: Container(
           height: 40,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -124,8 +126,10 @@ class ProfileScreen extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit Profile feature coming soon')),
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfileScreen(),
+                              ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -154,9 +158,7 @@ class ProfileScreen extends StatelessWidget {
                           icon: const Icon(Icons.share),
                           color: AppTheme.textPrimary,
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Share profile feature coming soon')),
-                            );
+                            _showShareProfileSheet(context);
                           },
                         ),
                       ),
@@ -337,6 +339,88 @@ class ProfileScreen extends StatelessWidget {
         style: const TextStyle(
           color: AppTheme.textSecondary,
           fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  void _showShareProfileSheet(BuildContext context) {
+    const profileLink = 'https://pinterest-clone.app/u/priyanka-bais';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Share profile',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                leading: const Icon(Icons.copy, color: AppTheme.textPrimary),
+                title: const Text(
+                  'Copy profile link',
+                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(profileLink),
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(text: profileLink));
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile link copied')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.qr_code_2, color: AppTheme.textPrimary),
+                title: const Text(
+                  'Show QR code',
+                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('QR feature coming soon')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_outlined, color: AppTheme.textPrimary),
+                title: const Text(
+                  'More share options',
+                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('System share coming soon')),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
