@@ -1,12 +1,8 @@
-# ✅ Pinterest Clone Assignment - Complete Guide
+# ✅ Pinterest Clone - Complete Guide
 
-## 🎯 Assignment Summary (Simple Explanation)
+## 🎯Summary (Simple Explanation)
 
-You need to build a **Pinterest mobile app clone** that looks and works exactly like the real Pinterest app. The assignment tests:
-- Your Flutter skills
-- Attention to detail
-- Clean code architecture
-- UI/UX polish
+ **Pinterest mobile app clone** that looks and works exactly like the real Pinterest app.
 
 ## 📋 What You Need to Do
 
@@ -129,7 +125,7 @@ Record a 5-10 minute video showing:
 - Pin detail view
 - All navigation
 
-## 📝 Assignment Checklist
+## 📝Checklist Points
 
 - ✅ Clean Architecture (Presentation, Domain, Data)
 - ✅ Riverpod State Management
@@ -153,13 +149,6 @@ Record a 5-10 minute video showing:
 5. **Error Handling**: Falls back to sample images if API fails
 6. **Best Practices**: Uses modern Flutter patterns
 
-## 💡 Tips for Best Score
-
-1. **Test thoroughly**: Make sure everything works
-2. **Add your API key**: Don't forget this step!
-3. **Record good video**: Show all features clearly
-4. **Clean commits**: If using Git, make meaningful commits
-5. **Documentation**: README is already included
 
 ## 🐛 Common Issues & Solutions
 
@@ -191,7 +180,3 @@ Everything is ready. Just:
 1. Add your API key
 2. Run `flutter pub get`
 3. Run `flutter run`
-4. Build APK for submission
-5. Record iOS video
-
-Good luck with your assignment! 🚀
