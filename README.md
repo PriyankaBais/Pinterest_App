@@ -73,7 +73,7 @@ The app includes:
 - Pin detail screen with full image view
 - Bottom navigation bar (Home, Search, Create, Notifications, Profile)
 
-## 🎯 Assignment Requirements Met
+## 🎯Requirements Checklist
 
 ✅ **Clean Architecture** - Properly structured with Presentation, Domain, Data layers
 ✅ **Riverpod State Management** - All state managed with Riverpod providers
@@ -185,3 +185,5 @@ This project is for educational/assignment purposes.
 ---
 
 **Note**: Remember to add your API key before running the app!
+
+**Created By**-Priyanka Bais
