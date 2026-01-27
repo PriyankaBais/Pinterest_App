@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/pin_providers.dart';
 import '../widgets/pin_card.dart';
+import '../widgets/pin_shimmer_card.dart';
 import '../../../messages/presentation/screens/messages_screen.dart';
 import '../../../notifications/presentation/screens/notifications_full_screen.dart';
 
@@ -18,9 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _currentPage = 1;
   final ScrollController _scrollController = ScrollController();
-  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -37,34 +35,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.8) {
-      _loadMore();
-    }
-  }
-
-  void _loadMore() {
-    if (!_isLoadingMore) {
-      setState(() {
-        _isLoadingMore = true;
-        _currentPage++;
-      });
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _isLoadingMore = false;
-        });
-      });
+      ref.read(curatedFeedProvider.notifier).loadMore();
     }
   }
 
   Future<void> _refresh() async {
-    setState(() {
-      _currentPage = 1;
-    });
-    ref.invalidate(curatedPinsProvider(1));
+    await ref.read(curatedFeedProvider.notifier).refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    final pinsAsync = ref.watch(curatedPinsProvider(_currentPage));
+    final feedState = ref.watch(curatedFeedProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -110,9 +91,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _refresh,
         color: AppTheme.primaryRed,
-        child: pinsAsync.when(
-          data: (pins) {
-            if (pins.isEmpty) {
+        child: Builder(
+          builder: (context) {
+            if (feedState.isLoadingInitial) {
+              return CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(AppConstants.gridPadding),
+                    sliver: SliverMasonryGrid.count(
+                      crossAxisCount: AppConstants.gridCrossAxisCount,
+                      mainAxisSpacing: AppConstants.gridMainAxisSpacing,
+                      crossAxisSpacing: AppConstants.gridCrossAxisSpacing,
+                      itemBuilder: (context, index) {
+                        final height = 180 + (index % 5) * 70.0;
+                        return PinShimmerCard(height: height);
+                      },
+                      childCount: 12,
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            if (feedState.error != null && feedState.pins.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: AppTheme.textSecondary),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Error loading pins',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: _refresh,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryRed,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (feedState.pins.isEmpty) {
               return const Center(
                 child: Text(
                   'No pins available',
@@ -120,6 +147,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               );
             }
+
+            final pins = feedState.pins;
+            final shimmerTailCount = feedState.isLoadingMore ? 6 : 0;
+
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -135,49 +166,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           pin: pins[index],
                           onTap: () => context.push('/pin/${pins[index].id}'),
                         );
-                      } else if (_isLoadingMore) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: CircularProgressIndicator(
-                              color: AppTheme.primaryRed,
-                            ),
-                          ),
-                        );
                       }
-                      return const SizedBox.shrink();
+
+                      final shimmerIndex = index - pins.length;
+                      final height = 160 + (shimmerIndex % 5) * 70.0;
+                      return PinShimmerCard(height: height);
                     },
-                    childCount: pins.length + (_isLoadingMore ? 1 : 0),
+                    childCount: pins.length + shimmerTailCount,
                   ),
                 ),
               ],
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppTheme.primaryRed),
-          ),
-          error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: AppTheme.textSecondary),
-                const SizedBox(height: 16),
-                Text(
-                  'Error loading pins',
-                  style: const TextStyle(color: AppTheme.textSecondary),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: _refresh,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryRed,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

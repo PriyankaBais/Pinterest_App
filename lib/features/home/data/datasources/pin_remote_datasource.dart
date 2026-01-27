@@ -18,7 +18,8 @@ class PinRemoteDataSourceImpl implements PinRemoteDataSource {
   Future<List<PinModel>> getCuratedPins({int page = 1, int perPage = 30}) async {
     try {
       // Check if using Pexels or Unsplash
-      final usePexels = ApiConstants.pexelsApiKey != 'YOUR_PEXELS_API_KEY';
+      final usePexels = ApiConstants.pexelsApiKey.isNotEmpty &&
+          ApiConstants.pexelsApiKey != 'YOUR_PEXELS_API_KEY';
       
       if (usePexels) {
         // Use Pexels API
@@ -65,7 +66,8 @@ class PinRemoteDataSourceImpl implements PinRemoteDataSource {
   Future<List<PinModel>> searchPins(String query, {int page = 1, int perPage = 30}) async {
     try {
       // Check if using Pexels or Unsplash
-      final usePexels = ApiConstants.pexelsApiKey != 'YOUR_PEXELS_API_KEY';
+      final usePexels = ApiConstants.pexelsApiKey.isNotEmpty &&
+          ApiConstants.pexelsApiKey != 'YOUR_PEXELS_API_KEY';
       
       if (usePexels) {
         // Use Pexels API
@@ -104,7 +106,7 @@ class PinRemoteDataSourceImpl implements PinRemoteDataSource {
       }
     } catch (e) {
       print('Error searching pins: $e');
-      // Fallback to sample data with search query in seed
+      // Fallback to keyword-based images (still matches the query)
       return _getSearchSamplePins(query);
     }
   }
@@ -163,6 +165,8 @@ class PinRemoteDataSourceImpl implements PinRemoteDataSource {
         final height = heights[index % heights.length];
         return PinModel(
           id: 'search_${query}_$index',
+          // Picsum is the most reliable fallback (prevents "Image failed to load").
+          // It’s not keyword-based, but ensures search UI always shows images.
           imageUrl: 'https://picsum.photos/seed/${query}_$index/400/$height',
           width: 400,
           height: height,

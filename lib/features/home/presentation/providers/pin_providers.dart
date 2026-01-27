@@ -8,6 +8,11 @@ import '../../domain/usecases/search_pins.dart';
 import '../../domain/usecases/get_pin_by_id.dart';
 import '../../domain/entities/pin_entity.dart';
 
+// Home Feed (paged) Provider
+final curatedFeedProvider = NotifierProvider<CuratedFeedNotifier, CuratedFeedState>(() {
+  return CuratedFeedNotifier();
+});
+
 // Dio Client Provider
 final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient();
@@ -137,5 +142,121 @@ class SearchPinsState {
       error: clearError ? null : (error ?? this.error),
       query: query ?? this.query,
     );
+  }
+}
+
+class CuratedFeedState {
+  final bool isLoadingInitial;
+  final bool isLoadingMore;
+  final List<PinEntity> pins;
+  final String? error;
+  final int page;
+  final bool hasMore;
+
+  const CuratedFeedState({
+    required this.isLoadingInitial,
+    required this.isLoadingMore,
+    required this.pins,
+    required this.page,
+    required this.hasMore,
+    this.error,
+  });
+
+  factory CuratedFeedState.initial() {
+    return const CuratedFeedState(
+      isLoadingInitial: true,
+      isLoadingMore: false,
+      pins: [],
+      error: null,
+      page: 1,
+      hasMore: true,
+    );
+  }
+
+  CuratedFeedState copyWith({
+    bool? isLoadingInitial,
+    bool? isLoadingMore,
+    List<PinEntity>? pins,
+    String? error,
+    bool clearError = false,
+    int? page,
+    bool? hasMore,
+  }) {
+    return CuratedFeedState(
+      isLoadingInitial: isLoadingInitial ?? this.isLoadingInitial,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      pins: pins ?? this.pins,
+      error: clearError ? null : (error ?? this.error),
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+    );
+  }
+}
+
+class CuratedFeedNotifier extends Notifier<CuratedFeedState> {
+  static const int _perPage = 30;
+
+  @override
+  CuratedFeedState build() {
+    Future.microtask(_loadInitial);
+    return CuratedFeedState.initial();
+  }
+
+  Future<void> refresh() async {
+    state = state.copyWith(
+      isLoadingInitial: true,
+      isLoadingMore: false,
+      pins: [],
+      page: 1,
+      hasMore: true,
+      clearError: true,
+    );
+    await _loadInitial();
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoadingInitial || state.isLoadingMore || !state.hasMore) return;
+
+    state = state.copyWith(isLoadingMore: true, clearError: true);
+
+    final nextPage = state.page + 1;
+    try {
+      final getCuratedPins = ref.read(getCuratedPinsProvider);
+      final nextPins = await getCuratedPins.call(page: nextPage, perPage: _perPage);
+
+      final merged = [...state.pins, ...nextPins];
+      state = state.copyWith(
+        isLoadingMore: false,
+        pins: merged,
+        page: nextPage,
+        hasMore: nextPins.isNotEmpty,
+        clearError: true,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingMore: false,
+        error: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _loadInitial() async {
+    try {
+      final getCuratedPins = ref.read(getCuratedPinsProvider);
+      final pins = await getCuratedPins.call(page: 1, perPage: _perPage);
+      state = state.copyWith(
+        isLoadingInitial: false,
+        pins: pins,
+        page: 1,
+        hasMore: pins.isNotEmpty,
+        clearError: true,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingInitial: false,
+        pins: [],
+        error: e.toString(),
+      );
+    }
   }
 }
