@@ -12,7 +12,7 @@ class ApiService {
   ApiService() {
     _dio.options.baseUrl = 'https://api.unsplash.com';
     _dio.options.headers['Authorization'] =
-        'Client-ID DPIUiGXVghrU2oCgyv8htWelnpRQSPXZmLZJ7HL78cbZq72m9Piwe2y5';
+        'Client-ID api _key';
   }
 
   Future<List<PhotoModel>> getPhotos() async {
