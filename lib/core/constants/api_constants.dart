@@ -5,7 +5,7 @@ class ApiConstants {
   
   // Unsplash API (Alternative)
   static const String unsplashBaseUrl = 'https://api.unsplash.com';
-  static const String unsplashApiKey = 'DPIUiGXVghrU2oCgyv8htWelnpRQSPXZmLZJ7HL78cbZq72m9Piwe2y5';
+  static const String unsplashApiKey = 'api_key';
   
   // API Endpoints
   static const String curatedPhotos = '/curated';
